@@ -15,10 +15,10 @@ export default class Lobby {
   roomStatusField: any;
   roomImagesField: any;
   currentRoomPanel: any;
-  paginatorPanel: any;
   freeRoomContainer: any;
   busyRoomContainer: any;
   roomNotFoundPanel: any;
+  idPlayerBackend: any;
   /**
    *
    * @param {*} parent
@@ -76,10 +76,22 @@ export default class Lobby {
 
   _addRoom(data : any) {
     Bus.emit('hideNotFoundRoomPanel');
-    Bus.emit('showPaginatorPanel');
+    let gameTime = data.settings.play;
+    
+    const d = [3600, 60, 1];
+    const time = [];
+    let i = 0;
+    while (i < d.length) {
+      let t = Math.floor(gameTime / d[i]);
+      gameTime -= t * d[i];
+      let strT = ((t >= 0 && t < 10) ? '0' + t : t).toString();
+      time.push(strT);
+      i++;
+    }
+
     const room = {name : data.name, playersCount : data.players.connections.get.length,
-      playersCapacity : data.players.capacity, difficult : this._getModeByMines(data.field.mines),
-      width : data.field.width, height : data.field.height, mines : data.field.mines, time : '0:00:00',
+      playersCapacity : data.players.capacity,
+      width : data.field.width, height : data.field.height, mines : data.field.mines, time : `${time[0]}:${time[1]}:${time[2]}`,
       observersCount : data.observers.get.length, status : this._getStatusByCode(data.status)}
     
     if (data.status === 3) {   // busy room
@@ -90,16 +102,10 @@ export default class Lobby {
       Bus.emit('addFreeRoomView', room);
     }
 
-    // if (this.currentRoomId === -2) { 
-    //   this.currentRoomId = this.rooms.length - 1;
-    //   //Bus.emit('changeRoomStringColor',{type : 'free', id : this.currentRoomId, typeColor : 1})
-    //   const info = {name : this.rooms[this.currentRoomId].name, length : this.rooms[this.currentRoomId].players.connections.get.length,
-    //     capacity : this.rooms[this.currentRoomId].players.capacity}
-    //   this._updateCurrentRoom(info);
-    // }
   }
 
   _updateRoom(data : any) {
+    
     if (data.status === 3) {
       for (let i = 0; i < this.busyRooms.length; i++) {
         if (this.busyRooms[i].id === data.id) {
@@ -115,18 +121,31 @@ export default class Lobby {
         }
       }
     }
+
+    //console.log('currRoomId ', this.currentRoomId, this.rooms)
+    
+    if (this.currentRoomId < 0 || this.currentRoomId >= this.rooms.length) {
+      return;
+    }
+    //console.log(data, ' ',  data.id, ' eeee ', this.rooms[this.currentRoomId].id)
+    if (this.rooms[this.currentRoomId].id === data.id) {
+        Bus.emit('showCurrentRoomPanel', {name: data.name, length: data.players.connections.get.length, capacity: data.players.capacity});
+    }
   }
 
   _deleteRoom(data : any) {
-    if (data.status === 3) {
-      for (let i = 0; i < this.busyRooms.length; i++) {
-        if (this.busyRooms[i].id === data) {
-          Bus.emit('deleteRoomRow', {type : 'busy', num : i});
-          this.busyRooms.splice(i, 1);
-          break;
-        }
-      } 
-    } else {
+    console.log(this.busyRooms, ' ', this.rooms, ' ', data)
+    let busyRoomsDelete = false;
+    for (let i = 0; i < this.busyRooms.length; i++) {
+      if (this.busyRooms[i].id === data) {
+        Bus.emit('deleteRoomRow', {type : 'busy', num : i});
+        this.busyRooms.splice(i, 1);
+        busyRoomsDelete = true;
+        break;
+      }
+    } 
+    
+    if (!busyRoomsDelete) {
       for (let i = 0; i < this.rooms.length; i++) {
         if (this.rooms[i].id === data) {
           Bus.emit('deleteRoomRow', {type : 'free', num : i});
@@ -135,9 +154,9 @@ export default class Lobby {
         }
       }
     }
+
     if (this.rooms.length === 0 && this.busyRooms.length === 0) { // not found rooms
       Bus.emit('showNotFoundRoomPanel');
-      Bus.emit('hidePaginatorPanel');
     }
   }
 
@@ -146,21 +165,33 @@ export default class Lobby {
     this.currentRoomId = -1;
     this.rooms = []
     this.busyRooms = []
+    let lobby = data.lobby;
   
     Bus.emit('clearAllRoomsPanels');
-    Bus.emit('showPaginatorPanel');
     Bus.emit('hideCurrentRoomPanel');
     Bus.emit('hideNotFoundRoomPanel');
     
-    if (data.allRooms.get.length === 0) { // not found rooms
+    if (lobby.allRooms.get.length === 0) { // not found rooms
       Bus.emit('showNotFoundRoomPanel');
-      Bus.emit('hidePaginatorPanel');
     }
 
-    data.allRooms.get.forEach((item : any, i : number) => {
+    lobby.allRooms.get.forEach((item : any) => {
+
+      let gameTime = item.settings.play;
+      const d = [3600, 60, 1];
+      const time = [];
+      let i = 0;
+      while (i < d.length) {
+        let t = Math.floor(gameTime / d[i]);
+        gameTime -= t * d[i];
+        let strT = ((t >= 0 && t < 10) ? '0' + t : t).toString();
+        time.push(strT);
+        i++;
+      }
+
       const room = {name : item.name, playersCount : item.players.connections.get.length,
-        playersCapacity : item.players.capacity, difficult : this._getModeByMines(item.field.mines),
-        width : item.field.width, height : item.field.height, mines : item.field.mines, time : '0:00:00',
+        playersCapacity : item.players.capacity,
+        width : item.field.width, height : item.field.height, mines : item.field.mines, time : `${time[0]}:${time[1]}:${time[2]}`,
         observersCount : item.observers.get.length, status : this._getStatusByCode(item.status)}
       
       if (item.status === 3 || item.status === 2) {   // busy room
@@ -209,7 +240,7 @@ export default class Lobby {
         mode = 'God';
         break;
     }
-    mode = 'Normal'; //!!!!!!!!!!!! Убрать, заглушка
+    mode = 'Normal'; //  заглушка
     return mode;
   }
 

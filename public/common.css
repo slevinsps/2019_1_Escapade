@@ -2,11 +2,36 @@ html,
 body {
   margin: 0;
   height: 100%;
-  /* overflow: hidden */
+  overflow: hidden
 }
 
 .text-center {
   text-align: center
+}
+
+.text-left {
+  text-align: left
+}
+
+.text-right {
+  text-align: right
+}
+
+.flex-end {
+  justify-content: flex-end;
+}
+
+.flex-start {
+  justify-content: flex-start;
+}
+
+.flex {
+  display: flex
+}
+
+.flex-rev {
+  display: flex;
+  flex-direction: row-reverse;
 }
 
 .bar-vertical {
@@ -63,6 +88,10 @@ body {
   margin-left: 1.3rem;
 }
 
+.ml-auto {
+  margin-left: auto;
+}
+
 .mb-1 {
   margin-bottom: 0.35rem;
 }
@@ -103,4 +132,8 @@ body {
 
 .pl-4 {
   padding-left: 2.3rem;
+}
+
+.block_left {
+  margin-right: auto;
 }

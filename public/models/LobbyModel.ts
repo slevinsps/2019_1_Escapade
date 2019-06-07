@@ -1,6 +1,8 @@
 import Bus from '../utils/bus';
 import { WebSocketInterface } from '../utils/webSocket';
 import router from '../../public/main'
+import * as dataAddress from './../../netconfig.json';
+
 /**
  *
  */
@@ -16,16 +18,21 @@ export default class LobbyModel {
    *
    */
   constructor() {
-    this.wsAdress = 'wss://back.ser.ru.com/game/ws';
-
+    this.wsAdress = dataAddress.lobbyWsAddress;
     this.currentRoomInfo = [];
 
 
     Bus.on('currentPath', this._currentPathSignalFunc.bind(this), 'lobbyModel');
-
+    Bus.on('lobbyCreateNewWebSocket', this._createWs.bind(this), 'lobbyModel');
+    
 
     this.curPath = '';
     this.wsReconnect = true;
+  }
+
+  _createWs(){
+    console.log("CREATE NEW WEB SOCKET")
+    this.ws = new WebSocketInterface(this.wsAdress)
   }
 
   _busAllOn() {
@@ -51,15 +58,17 @@ export default class LobbyModel {
     if (path === '/lobby') {
       this.curPath = path;
       this._busAllOn();
-      if (this.wsReconnect) {
+      if (typeof this.ws == "undefined") {
         console.log("CREATE NEW WEBSOCKET");
         this.ws = new WebSocketInterface(this.wsAdress);
       }
+      Bus.emit('getWSMultiplayer', this.ws);
     } else {
       if (this.curPath === '/lobby') {
         this._leaveRoom(14);
         this._busAllOff()
         this.ws.closeConnection();
+        this.ws = undefined;
         this.wsReconnect = true;
         this.curPath = '';
       }
@@ -71,7 +80,7 @@ export default class LobbyModel {
     console.log('_getInfo begin ', data)
     switch (data.type) {
       case 'Lobby':
-        Bus.emit('updateRooms', data.value.lobby);
+        Bus.emit('updateRooms', data.value);
         break;
       case 'LobbyRoomCreate':
         Bus.emit('addRoom', data.value);
@@ -106,11 +115,12 @@ export default class LobbyModel {
     const observers = 10;
     const mines = data.mines;
     const title = data.title;
+    const time = data.time;
     this.ws.sendInfoJSON({
       send: {
         RoomSettings: {
           name: title, id: 'create', width: width, height: height,
-          players: players, observers: observers, prepare: 10, play: 100, mines: mines
+          players: players, observers: observers, prepare: 10, play: time, mines: mines
         }
       }
     });

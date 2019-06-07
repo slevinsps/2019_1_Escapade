@@ -10,6 +10,7 @@
     padding-top: 10px;
     padding-bottom: 10px;
     overflow-y: scroll;
+    overflow-x: hidden;
   }
 
 
@@ -31,7 +32,7 @@
 
 
 
-  
+
   &__players_list_row {
     display: flex;
     text-align: center;
@@ -45,7 +46,7 @@
 
     @media screen and (max-width: $tablet) {
       & {
-        width: 290px;
+        width: 334px;
         margin-left: 0;
       }
     }
@@ -85,18 +86,33 @@
 
     @media screen and (max-width: $tablet) {
       & {
-        width: initial;
+        width: 100px;
         font-size: 15px;
+        overflow: hidden;
+        padding-top: 12px;
       }
     }
   }
 
   &__players_list_player_name {
     margin-left: 5px;
+    line-height: 46px;
+    @media screen and (max-width: $tablet) {
+      & {
+        line-height: 28px;
+      }
+    }
   }
 
   &__players_list_player_points {
     margin-left: 21px;
+    text-align: right;
+    line-height: 46px;
+    @media screen and (max-width: $tablet) {
+      & {
+        line-height: 28px;
+      }
+    }
   }
 
   &__players_list_disconnect {
@@ -115,22 +131,21 @@
     margin-top: 7px;
 
     background: url('./img/disconnect.png') no-repeat;
+    background-size: cover;
   }
 
   &__players_list_explose_img {
     width: 40px;
     height: 40px;
-    margin-top: 7px;
-    margin-right: 7px;
     background: url('./img/explosePlayer.png') no-repeat;
+    background-size: cover;
   }
 
   &__players_list_win_img {
     width: 47px;
     height: 40px;
-    margin-top: 7px;
-    margin-right: 7px;
     background: url('./img/win.png') no-repeat;
+    background-size: cover;
   }
 
   &__players_list_clock_img {
@@ -139,6 +154,7 @@
     margin-top: 7px;
     margin-right: 7px;
     background: url('./img/clockPlayerList.png') no-repeat;
+    background-size: cover;
   }
 
   &__players_list_flag_img {
@@ -163,4 +179,18 @@
       }
     }
   }
+}
+
+
+.game__players_list:hover::-webkit-scrollbar {
+  width: 7px;
+}
+
+.game__players_list::-webkit-scrollbar {
+  width: 0px;
+  transition: 3s linear;
+}
+
+.game__players_list::-webkit-scrollbar-thumb {
+  background: #ff3d00;
 }

@@ -1,6 +1,8 @@
 import Bus from '../utils/bus';
 import { Net } from '../utils/net';
 import { WebSocketInterface } from '../utils/webSocket';
+import * as dataAddress from './../../netconfig.json';
+
 /**
  *
  */
@@ -12,21 +14,20 @@ export default class ProfileModel {
    *
    */
   constructor() {
-    this.wsAdress = 'ws://localhost:3004/history/ws';
+    this.wsAdress = dataAddress.profileWsAddress;
+
     Bus.on('currentPath', this._currentPathSignalFunc.bind(this), 'profileModel');
+    Bus.on('changeProfile', this._changeProfile.bind(this), 'profileModel');
   }
 
   _busAllOn() {
     Bus.on('getAvatar', this._getAvatar.bind(this), 'profileModel');
-    Bus.on('changeProfile', this._changeProfile.bind(this), 'profileModel');
     Bus.on('uploadAvatar', this._uploadAvatar.bind(this), 'profileModel');
     Bus.on('getInfoFromWS', this._getInfo.bind(this), 'profileModel');
-
   }
 
   _busAllOff() {
     Bus.off('getAvatar', this._getAvatar.bind(this), 'profileModel');
-    Bus.off('changeProfile', this._changeProfile.bind(this), 'profileModel');
     Bus.off('uploadAvatar', this._uploadAvatar.bind(this), 'profileModel');
     Bus.off('getInfoFromWS', this._getInfo.bind(this), 'profileModel');
   }
@@ -46,9 +47,10 @@ export default class ProfileModel {
   }
 
   _getInfo(data: any) {
-    console.log('_getInfo begin ', data)
+    //console.log('_getInfo ', data)
     switch (data.type) {
       case 'Lobby':
+        console.log('updateProfileGames')
         Bus.emit('updateProfileGames', data.value);
         break;
     }

@@ -5,6 +5,14 @@
   align-items: center;
   font-family: Saira;
   background: $escapade-gradient;
+  
+  &__table_avatar {
+    height: 6vh;
+    width: 6vh;
+    border-radius: 50%;
+    /* background: url(/img/flag.png) no-repeat; */
+    background-size: cover;
+  }
 
   &__back {
     background: url('./img/flag-right.png');
@@ -120,6 +128,7 @@
         width: 1.4rem;
         height: 1.4rem;
         text-align: center;
+        line-height: 26px;
       }
     }
 
@@ -135,8 +144,7 @@
     }
 
     &_avatar {
-      height: 5vh;
-      width: 5vh;
+
 
       &_back {
         border-radius: 50%;
@@ -206,6 +214,10 @@
       cursor: pointer;
     }
 
+    &_left:hover {
+      animation: go-left .4s linear .2s 1 normal forwards;
+    }
+
     &_right {
       background: url('./img/flag-right.png');
       background-repeat: no-repeat;
@@ -213,6 +225,10 @@
       height: 60px;
       width: 60px;
       cursor: pointer;
+    }
+
+    &_right:hover {
+      animation: go-right .4s linear .2s 1 normal forwards;
     }
   }
 }

@@ -67,7 +67,7 @@
 }
 .lobby_room_settings_content{
   width: 370px;
-  height: 554px;
+  height: 662px;
   padding: 10px;
   background-color: #667787;
   border-radius: 15px;
@@ -85,11 +85,15 @@
 .lobby_room_close_settings {
   width: 30px;
   height: 30px;
-  background: url(/img/cancel.png) #CED6DD no-repeat;
+  background: url('./img/cancel.png') #CED6DD no-repeat;
   background-size: contain;
   align-self: center;
   border-radius: 50%;
   position: relative;
+}
+
+.lobby_room_close_settings:hover {
+  filter: brightness(125%)
 }
 
 .lobby_room_settings_ok_button {
@@ -109,6 +113,10 @@
   border-radius: 10px;
 }
 
+.lobby_room_settings_ok_button:hover {
+  filter: brightness(125%)
+}
+
 .lobby_room_settings_button .lobby_room_settings_content {
   opacity: 0;
 }
@@ -123,6 +131,8 @@
   font-size: 25px;
 
 }
+
+
 
 .lobby_room_input {
   height: 35px;

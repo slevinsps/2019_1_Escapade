@@ -100,19 +100,19 @@ export default class SinglePlayerView extends BaseView {
 
   _setStylesOnStart() {
     const width = screen.width;
-    //this.settings.style.display = 'none';
+    this.settings.style.display = 'none';
     //this.progressBar.style.display = 'flex';
 
     if (width <= 440) {
       this.playerInfo.style.transform = "translateY(-390px)";
       //this.timerContainer.style.transform = "translateY(-100px)"
-      this.fieldContainer.style.transform = "translateY(110px)"
+      this.fieldContainer.style.transform = "translateY(90px)"
     }
   }
 
   _rollbackStylesOnEnd() {
     const width = screen.width;
-    //this.settings.style.display = 'flex';
+    this.settings.style.display = 'flex';
     //this.progressBar.style.display = 'none';
 
     if (width <= 440) {

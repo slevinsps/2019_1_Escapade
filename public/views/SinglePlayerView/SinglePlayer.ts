@@ -56,7 +56,6 @@ export default class SinglePlayer {
   }
 
   _busAllOn() {
-    console.log('WWWWWWWWWWWWWWWWWw');
     Bus.on('leftClickOnCell', this._clickOnCell.bind(this), 'singlePlayerView');
     Bus.on('rightClickOnCell', this._rightСlickOnCell.bind(this), 'singlePlayerView');
     Bus.on('settingsChangeHard', this._changeHard.bind(this), 'singlePlayerView');
@@ -88,10 +87,10 @@ export default class SinglePlayer {
     if (User.name) {
       Bus.emit('userNameInGameChange', User.name);
       Bus.emit('userPhotoInGameChange', User.avatar);
-      
+
       if (User.bestScore.String) {
         Bus.emit('userScoreInGameChange', User.bestScore.String) // получать из user
-        Bus.emit('userTimeInGameChange', User.bestScore.String);
+        Bus.emit('userTimeInGameChange', User.bestTime.String);
       } else {
         Bus.emit('userScoreInGameChange', 0)
         Bus.emit('userTimeInGameChange', '0:00:00');
@@ -119,7 +118,7 @@ export default class SinglePlayer {
     Bus.emit('statisticsResetParameters', this.minesCount)
     Bus.emit('settingsSetParameters', { difficult: this.difficult, width: this.cellNumbersX, height: this.cellNumbersY, mines: this.minesCount })
     this.mineSweeperCreate = true;
-    
+
     return;
   }
 
@@ -138,7 +137,7 @@ export default class SinglePlayer {
       }
     }
     Bus.emit('setStylesOnStartSingle');
-    
+
     this.stopwatch.start();
     this._showMap();
   }
@@ -147,24 +146,26 @@ export default class SinglePlayer {
   _changeHard(hardStruct: any) {
     Bus.emit('setStylesOnStartSingle');
     this.difficult = hardStruct.difficult;
-
+    this.cellNumbersX = hardStruct.width;
+    this.cellNumbersY = hardStruct.height;
+    let difficultCoef = 0.2;
     switch (this.difficult) {
       case 0:
-        this.minesCount = 10;
+        difficultCoef = 0.1;
         break;
       case 1:
-        this.minesCount = 20;
+        difficultCoef = 0.2;
         break;
       case 2:
-        this.minesCount = 30;
+        difficultCoef = 0.3
         break;
       case 3:
-        this.minesCount = 40;
+        difficultCoef = 0.4
         break;
     }
-    this.cellNumbersX = 15;
-    this.cellNumbersY = 15;
-    Bus.emit('settingsChangeSize', { width: this.cellNumbersX, height: this.cellNumbersY });
+
+    this.minesCount = Math.round(difficultCoef * this.cellNumbersX * this.cellNumbersY);
+
     Bus.emit('settingsChangeMinesCount', this.minesCount);
     checkAuth(this._updateUserInfoCalback.bind(this), this.difficult)
     this.stopwatch.stop();
@@ -181,23 +182,23 @@ export default class SinglePlayer {
     const x = parseInt(coordinatesStruct.x);
     const y = parseInt(coordinatesStruct.y);
     if (this.mineSweeperCreate) {
-      this.mineSweeper = new MineSweeper(this.cellNumbersX, this.cellNumbersY, this.minesCount, {startX : x, startY : y});
+      this.mineSweeper = new MineSweeper(this.cellNumbersX, this.cellNumbersY, this.minesCount, { startX: x, startY: y });
       this.mineSweeperCreate = false
     }
-    
+
     if (this.firstClick) {
       this.start = true;
       this.firstClick = false;
       this.stopwatch.start();
       Bus.emit('setStylesOnStartSingle');
-      
+
       this.BBBVCount = this.mineSweeper.count3BV();
     }
     if (!this.start) {
       return;
     }
-    
-    
+
+
     if (this.mineSweeper.mapLabel[x][y] != 0) { // если не закрыта
       return;
     }
@@ -226,12 +227,13 @@ export default class SinglePlayer {
       this.stopwatch.stop();
       this.start = false;
 
-      Bus.emit('sendResultsSingleGame', JSON.stringify({ difficult: this.difficult, singleTotal: 1, singleWin: 0 }));
+      Bus.emit('sendResultsSingleGame', { difficult: this.difficult, singleTotal: 1, singleWin: 0 });
       Bus.emit('showTextInMessageBox', 'You lose!');
-
-      Bus.emit('rollbackStylesOnEndSingle');
+      checkAuth(this._updateUserInfoCalback.bind(this), this.difficult)
       loser = true;
+      Bus.emit('rollbackStylesOnEndSingle');
     }
+    
     return loser;
   }
 
@@ -257,6 +259,7 @@ export default class SinglePlayer {
       }
       Bus.emit('showTextInMessageBox', 'You win!');
       Bus.emit('rollbackStylesOnEndSingle');
+      checkAuth(this._updateUserInfoCalback.bind(this), this.difficult)
       winner = true;
     }
     return winner;
