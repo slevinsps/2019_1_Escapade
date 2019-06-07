@@ -28,4 +28,6 @@
 - Усердный фронтендер - [Сергей Апарин](https://github.com/Bigyin1)
 
 ## Бэк
+
 - [Клик](https://github.com/frontend-park-mail-ru/2019_1_Escapade)
+
